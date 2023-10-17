@@ -97,6 +97,51 @@ impl ConstellationToken {
         read_components(&e); // TODO: read_components Implementation
     }
 
+    // Must return values in the same order as getComponents()
+    pub fn getAmounts(e: Env) -> Vec<u32> {
+        e.storage()
+            .instance()
+            .bump(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
+
+        read_amounts(&e); // TODO: read_amounts Implementation
+    }
+
+    pub fn setTargetComponentsAndWeights(e: Env, components: Vec<String>, amounts: Vec<u32>) {
+        let manager = read_manager(&e); // TODO: read_manager Implementation
+        manager.require_auth();
+
+        e.storage()
+            .instance()
+            .bump(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
+
+        write_target_components(&e, components, amounts); // TODO: write_components Implementation
+
+        // TODO: Implement Dutch Auction contract
+        // Auction params are set by the manager and include:
+        // - An intermediate component in which prices are denominated
+        // - Target components (incl. any components added or removed)
+        // - Target amounts for each component
+        // - A starting price for each target component
+        // - A minimum price for each target component
+        // - A price function that gradually lowers the acceptable price in terms of intermediate component (ex. linear, exponential, etc.) 
+        AuctionClient.start_rebalance_auctions(&e, target_components, target_amounts, auction_params, intermediate_token);
+        
+        fn AuctionClient.start_rebalance_auctions(&e: Env, target_components: Vec<Address>, target_amounts: Vec<u32>, auction_params: Vec<AuctionParam>, intermediate_token: Address) {
+            // Temporarily add intermediate token to components[] vector
+            for i in 0..target_components.len() {
+                // Start a Dutch auction for component[i]
+                // During an auction users are allowed to swap (target_amount[i] - current_amount[i]) of component tokens for intermediate token in the direction of (target_amount[i] - current_amount[i])
+                // component[i] auction stays open until the component reaches target amount.
+                // If the component[i] auction reaches minimum price, the auction will remain open indefinitely until the manager starts a new rebalance
+                // Note: Mint and Burn of ConstellationToken can still be performed while auctions are open
+            }
+        }
+
+        TokenUtils::new(&e).events().start_rebalance_auctions(components, amounts);
+    }
+
+
+
     // For future use: Allow the Constellation Token manager way to upgrade the associated MinterBurner contract
     // Initially will be disabled
     pub fn set_admin(e: Env, new_admin: Address) {
