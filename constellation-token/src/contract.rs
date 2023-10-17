@@ -32,7 +32,7 @@ impl ConstellationToken {
         e: Env,
         decimal: u32,
         components: Vec<String>,
-        units: Vec<u32>,
+        amounts: Vec<u32>,
         admin: Address, // Must be instance of ConstellationMinterBurner contract
         manager: Address, // For future use; manager can rebalance and charge fees
         name: String,
@@ -51,6 +51,9 @@ impl ConstellationToken {
                 symbol,
             },
         )
+
+        // Write <Vec> components and <Vec> amounts to persistent storage
+        write_components(&e, components, amounts); // TODO: write_components Implementation
     }
 
     pub fn mint(e: Env, to: Address, amount: i128) {
@@ -69,7 +72,7 @@ impl ConstellationToken {
         TokenUtils::new(&e).events().mint(admin, to, amount);
     }
 
-    fn burn(e: Env, from: Address, amount: i128) {
+    pub fn burn(e: Env, from: Address, amount: i128) {
         // 'from' will be the MinterBurner contract
         // A user calls the burn() function of the Constellation Minter Burner contract
         // The MinterBurner will receive the user's Constellation Tokens (redemption)
@@ -86,10 +89,18 @@ impl ConstellationToken {
         TokenUtils::new(&e).events().burn(from, amount);
     }
 
+    pub fn getComponents(e: Env) -> Vec<String> {
+        e.storage()
+            .instance()
+            .bump(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
+
+        read_components(&e); // TODO: read_components Implementation
+    }
+
     // For future use: Allow the Constellation Token manager way to upgrade the associated MinterBurner contract
     // Initially will be disabled
     pub fn set_admin(e: Env, new_admin: Address) {
-        let manager = read_manager(&e);
+        let manager = read_manager(&e); // TODO: read_manager Implementation
         manager.require_auth();
 
         e.storage()
@@ -100,6 +111,9 @@ impl ConstellationToken {
         TokenUtils::new(&e).events().set_admin(admin, new_admin);
     }
 }
+
+// End of ConstellationToken pseudocode
+// Most of below is unchanged from from "Token" example
 
 #[contractimpl]
 impl token::Interface for ConstellationToken {
