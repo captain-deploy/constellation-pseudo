@@ -33,9 +33,8 @@ impl ConstellationToken {
         decimal: u32,
         components: Vec<String>,
         units: Vec<u32>,
-        admin: Address,
-        manager: Address,
-        minter_burner: Address,
+        admin: Address, // Must be instance of ConstellationMinterBurner contract
+        manager: Address, // For future use; manager can rebalance and charge fees
         name: String,
         symbol: String
     ) {
@@ -57,8 +56,9 @@ impl ConstellationToken {
     pub fn mint(e: Env, to: Address, amount: i128) {
         check_nonnegative_amount(amount);
         let admin = read_administrator(&e);
-        // Require that the caller is the Constellation Minter Burner contract
-        
+        // A user calls the mint() function of the Constellation Minter Burner contract
+        // The MinterBurner will receive component tokens from the user
+        // Then the MinterBurner will call ContellationToken.mint() with 'to' as the user address (issuance)
         admin.require_auth();
 
         e.storage()
@@ -69,14 +69,33 @@ impl ConstellationToken {
         TokenUtils::new(&e).events().mint(admin, to, amount);
     }
 
-    pub fn set_admin(e: Env, new_admin: Address) {
-        let admin = read_administrator(&e);
-        admin.require_auth();
+    fn burn(e: Env, from: Address, amount: i128) {
+        // 'from' will be the MinterBurner contract
+        // A user calls the burn() function of the Constellation Minter Burner contract
+        // The MinterBurner will receive the user's Constellation Tokens (redemption)
+        // The MinterBurner will send the user component tokens
+        // Then the MinterBurner will call ContellationToken.burn()
+        from.require_auth();
+        check_nonnegative_amount(amount);
 
         e.storage()
             .instance()
             .bump(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
 
+        spend_balance(&e, from.clone(), amount);
+        TokenUtils::new(&e).events().burn(from, amount);
+    }
+
+    // For future use: Allow the Constellation Token manager way to upgrade the associated MinterBurner contract
+    // Initially will be disabled
+    pub fn set_admin(e: Env, new_admin: Address) {
+        let manager = read_manager(&e);
+        manager.require_auth();
+
+        e.storage()
+            .instance()
+            .bump(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
+        // Validate that the new admin is an instance of the Constellation Minter Burner contract
         write_administrator(&e, &new_admin);
         TokenUtils::new(&e).events().set_admin(admin, new_admin);
     }
@@ -147,19 +166,6 @@ impl token::Interface for ConstellationToken {
         spend_balance(&e, from.clone(), amount);
         receive_balance(&e, to.clone(), amount);
         TokenUtils::new(&e).events().transfer(from, to, amount)
-    }
-
-    fn burn(e: Env, from: Address, amount: i128) {
-        from.require_auth();
-
-        check_nonnegative_amount(amount);
-
-        e.storage()
-            .instance()
-            .bump(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
-
-        spend_balance(&e, from.clone(), amount);
-        TokenUtils::new(&e).events().burn(from, amount);
     }
 
     fn burn_from(e: Env, spender: Address, from: Address, amount: i128) {

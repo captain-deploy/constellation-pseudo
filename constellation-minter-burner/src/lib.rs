@@ -18,6 +18,7 @@ pub struct ConstellationMinterBurner;
 #[contractimpl]
 impl ConstellationMinterBurner {
     // Swap component tokens for newly minted Constellation tokens
+    // Function could also be called "issue()", but that might cause confusion with Stellar asset issuance
     pub fn mint(
         env: Env,
         from: Address,
@@ -34,7 +35,8 @@ impl ConstellationMinterBurner {
         ctoken.mint(env, to, ctoken_amount);
     }
 
-    // Swap component tokens for newly minted Constellation tokens
+    // Swap user's Constellation tokens for components, and burn Constellation tokens
+    // Function could also be called "redeem()"
     pub fn burn(
         env: Env,
         from: Address,
