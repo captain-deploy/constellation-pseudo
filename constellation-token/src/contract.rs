@@ -6,7 +6,6 @@
 // A Constellation Token is initialized with a list of component tokens and their units
 // A Constellation Token can be only be minted or burned by the Constellation Minter Burner contract.
 
-
 use crate::admin::{has_administrator, read_administrator, write_administrator};
 use crate::allowance::{read_allowance, spend_allowance, write_allowance};
 use crate::balance::{read_balance, receive_balance, spend_balance};

@@ -5,13 +5,11 @@
 #![no_std]
 
 use soroban_sdk::{contract, contractimpl, token, Address, Env, IntoVal};
-use crate::{contract::ConstellationToken, ConstellationTokenClient};
 
-mod constellationToken {
-    soroban_sdk::contractimport!(
-        file = "../..constellation-token/target/wasm32-unknown-unknown/release/constellation-token-contract.wasm"
-    );
-}
+
+// FIX: Import the ConstellationToken contract
+use crate::contract::ConstellationTokenClient;
+
 
 
 #[contract]
@@ -32,6 +30,7 @@ impl ConstellationMinterBurner {
         from.require_auth();
         // Transfer component tokens from 'from' to the ConstellationToken contract
         // Mint ctoken_amount of Constellation tokens to caller
+        let ctoken = ConstellationTokenClient::new(&env, &ctoken);
         ctoken.mint(env, to, ctoken_amount);
     }
 
@@ -45,7 +44,7 @@ impl ConstellationMinterBurner {
         // Verify 'from' user has approved ctoken_amount
         // Transfer component tokens from ConstellationToken contract to 'from' address
         // Burn ctoken_amount of Constellation tokens from caller
-        let ctoken = constellationToken::Client::new(&env, &ctoken);
+        let ctoken = ConstellationTokenClient::new(&env, &ctoken);
         ctoken.burn(env, from, ctoken_amount);
     }
 }
