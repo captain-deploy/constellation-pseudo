@@ -16,8 +16,7 @@ impl ConstellationTokenCreator {
         components: Vec<Address>,
         units: Vec<u32>,
         admin: Address, // ConstellationMinterBurner contract ID
-        manager: Address,
-        minter_burner: Address,
+        manager: Address, // For future use; manager can rebalance and charge fees
         name: String,
         symbol: Symbol
         wasm_hash: BytesN<32>,
@@ -36,5 +35,3 @@ impl ConstellationTokenCreator {
         deployed_address
     }
 }
-
-mod test;
