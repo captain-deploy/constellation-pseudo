@@ -1,3 +1,5 @@
+// This contract will resemble the "Deployer" Soroban example.
+// https://github.com/stellar/soroban-examples/blob/v20.0.0-rc2/deployer/deployer/src/lib.rs
 #![no_std]
 
 use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, Symbol, Val, Vec};
@@ -7,9 +9,6 @@ pub struct ConstellationTokenCreator;
 
 #[contractimpl]
 impl ConstellationTokenCreator {
-    /// This contract will resemble the "Deployer" Soroban example.
-    /// https://github.com/stellar/soroban-examples/blob/v20.0.0-rc2/deployer/deployer/src/lib.rs
-
     /// Deploy the ConstellationToken Wasm and after deployment invoke the initialize function
     /// Returns the contract ID and result of the initialize function.
     pub fn deploy(

@@ -1,3 +1,4 @@
+// Unchanged from https://github.com/stellar/soroban-examples/tree/main/token/src
 use soroban_sdk::{Env, String};
 use soroban_token_sdk::{metadata::TokenMetadata, TokenUtils};
 

@@ -1,3 +1,4 @@
+// Unchanged from https://github.com/stellar/soroban-examples/tree/main/token/src
 use soroban_sdk::{contracttype, Address};
 
 pub(crate) const DAY_IN_LEDGERS: u32 = 17280;

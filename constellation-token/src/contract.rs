@@ -58,6 +58,8 @@ impl ConstellationToken {
     pub fn mint(e: Env, to: Address, amount: i128) {
         check_nonnegative_amount(amount);
         let admin = read_administrator(&e);
+        // Require that the caller is the Constellation Minter Burner contract
+        
         admin.require_auth();
 
         e.storage()
