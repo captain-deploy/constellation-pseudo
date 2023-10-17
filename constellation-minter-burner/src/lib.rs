@@ -31,7 +31,7 @@ impl ConstellationMinterBurner {
         // Verify 'from' has approved allowances for each component token 
         from.require_auth();
         // Transfer component tokens from 'from' to the ConstellationToken contract
-        // Mint ctoken_amount of Constellation tokens to caller
+        // Mint ctoken_amount of Constellation tokens to 'to' address
         let ctoken = constellation_token::Client::new(&env, &ctoken);
         ctoken.mint(&to, &ctoken_amount);
     }
@@ -46,7 +46,7 @@ impl ConstellationMinterBurner {
     ) {
         // Verify 'from' user has approved ctoken_amount
         // Transfer component tokens from ConstellationToken contract to 'from' address
-        // Burn ctoken_amount of Constellation tokens from caller
+        // Burn ctoken_amount of Constellation tokens from user
         let ctoken = constellation_token::Client::new(&env, &ctoken);
         ctoken.burn(&from, &ctoken_amount);
     }

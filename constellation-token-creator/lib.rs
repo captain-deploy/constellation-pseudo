@@ -13,8 +13,9 @@ impl ConstellationTokenCreator {
     /// Returns the contract ID and result of the initialize function.
     pub fn deploy(
         env: Env,
+        decimal: u32,
         components: Vec<Address>,
-        units: Vec<u32>,
+        amounts: Vec<u32>,
         admin: Address, // ConstellationMinterBurner contract ID
         manager: Address, // For future use; manager can rebalance and charge fees
         name: String,
